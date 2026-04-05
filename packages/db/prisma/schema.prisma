@@ -1,0 +1,129 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ──────────────────────────────────────────
+// Multi-tenant: Users & Organizations
+// ──────────────────────────────────────────
+
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  passwordHash   String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  memberships    Membership[]
+}
+
+model Organization {
+  id          String       @id @default(uuid())
+  name        String
+  slug        String       @unique
+  plan        PlanType     @default(FREE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  memberships Membership[]
+  apiKeys     ApiKey[]
+}
+
+model Membership {
+  id             String       @id @default(uuid())
+  role           MemberRole   @default(MEMBER)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  createdAt      DateTime     @default(now())
+
+  @@unique([userId, organizationId])
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum PlanType {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+// ──────────────────────────────────────────
+// API Keys
+// ──────────────────────────────────────────
+
+model ApiKey {
+  id             String       @id @default(uuid())
+  key            String       @unique
+  name           String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+  revoked        Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  requestLogs    RequestLog[]
+
+  @@index([key])
+  @@index([organizationId])
+}
+
+// ──────────────────────────────────────────
+// Request Tracking (raw events)
+// ──────────────────────────────────────────
+
+model RequestLog {
+  id            String   @id @default(uuid())
+  apiKey        ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  apiKeyId      String
+  method        String
+  endpoint      String
+  statusCode    Int
+  latencyMs     Int
+  userAgent     String?
+  ipAddress     String?
+  metadata      Json?
+  idempotencyKey String?  @unique
+  timestamp     DateTime @default(now())
+
+  @@index([apiKeyId, timestamp])
+  @@index([timestamp])
+  @@index([apiKeyId, endpoint, timestamp])
+}
+
+// ──────────────────────────────────────────
+// Aggregated Metrics (computed by worker)
+// ──────────────────────────────────────────
+
+model AggregatedMetric {
+  id             String          @id @default(uuid())
+  organizationId String
+  apiKeyId       String?
+  endpoint       String?
+  period         AggPeriod
+  periodStart    DateTime
+  totalRequests  Int             @default(0)
+  errorCount     Int             @default(0)
+  avgLatencyMs   Float           @default(0)
+  p95LatencyMs   Float           @default(0)
+  p99LatencyMs   Float           @default(0)
+  createdAt      DateTime        @default(now())
+
+  @@unique([organizationId, apiKeyId, endpoint, period, periodStart])
+  @@index([organizationId, periodStart])
+  @@index([organizationId, period, periodStart])
+}
+
+enum AggPeriod {
+  MINUTE
+  HOUR
+  DAY
+}
