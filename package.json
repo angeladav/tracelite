@@ -1,7 +1,10 @@
 {
   "name": "tracelite",
   "private": true,
-  "workspaces": ["packages/*", "services/*"],
+  "workspaces": [
+    "packages/*",
+    "services/*"
+  ],
   "scripts": {
     "dev": "npm run start:dev --workspace=api",
     "db:migrate": "prisma migrate dev --schema=packages/db/prisma/schema.prisma",

@@ -1,10 +1,8 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "resolvePackageJsonExports": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    "isolatedModules": true,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -15,10 +13,18 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@tracelite/db": ["../../packages/db/src/index.ts"],
-      "@tracelite/db/*": ["../../packages/db/src/*"],
-      "@tracelite/common": ["../../packages/common/src/index.ts"],
-      "@tracelite/common/*": ["../../packages/common/src/*"]
+      "@tracelite/db": [
+        "../../packages/db/src/index.ts"
+      ],
+      "@tracelite/db/*": [
+        "../../packages/db/src/*"
+      ],
+      "@tracelite/common": [
+        "../../packages/common/src/index.ts"
+      ],
+      "@tracelite/common/*": [
+        "../../packages/common/src/*"
+      ]
     },
     "incremental": true,
     "skipLibCheck": true,
