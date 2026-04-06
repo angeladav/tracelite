@@ -14,7 +14,7 @@ generator client {
 model User {
   id             String         @id @default(uuid())
   email          String         @unique
-  passwordHash   String
+  password   String
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   memberships    Membership[]
