@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/passport-local": "^1.0.38",
     "prisma": "^5.22.0"
   },
   "dependencies": {
