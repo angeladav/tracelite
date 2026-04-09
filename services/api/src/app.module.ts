@@ -8,6 +8,10 @@ import { QueueModule } from './queue/queue.module';
 import { DatabaseModule } from './database/database.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { ThrottlerModule, seconds } from '@nestjs/throttler';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import Redis from 'ioredis';
+
 
 @Module({
   providers: [
@@ -16,6 +20,20 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
       useClass: JwtAuthGuard,
     }
   ],
-  imports: [DatabaseModule, AuthModule, OrganizationsModule, ApiKeysModule, TrackingModule, AnalyticsModule, QueueModule],
+  imports: [DatabaseModule, AuthModule, OrganizationsModule, ApiKeysModule, TrackingModule, AnalyticsModule, QueueModule,
+    ThrottlerModule.forRoot({
+      throttlers: [{
+        limit: 10,       // Max 10 requests
+        ttl: seconds(60) // Per 60 seconds
+      }],
+      storage: new ThrottlerStorageRedisService(new Redis(
+        {
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT!) || 6379,
+        }
+      )),
+    }),
+
+  ],
 })
 export class AppModule { }

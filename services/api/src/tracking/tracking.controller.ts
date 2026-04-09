@@ -2,6 +2,7 @@ import { Body, Controller, Post, Headers, HttpCode, UseGuards, Req } from '@nest
 import { TrackingService } from './tracking.service';
 import { TrackEventDto } from '@tracelite/common';
 import { ApiKeyGuard } from 'src/common/guards/api-key.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('track')
 export class TrackingController {
@@ -10,6 +11,7 @@ export class TrackingController {
         private readonly trackingService: TrackingService
     ) { }
 
+    @UseGuards(ThrottlerGuard)
     @UseGuards(ApiKeyGuard)
     @Post()
     @HttpCode(202)
