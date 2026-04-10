@@ -24,7 +24,9 @@ export class TrackingService {
             endpoint,
             statusCode,
             latencyMs,
-            apiKeyId: apiKey
+            apiKeyId: apiKey,
+            idempotencyKey: trackEventDto.idempotencyKey,
+            metadata: trackEventDto.metadata,
         };
 
         const res = await this.queueService.enqueue(trackData);

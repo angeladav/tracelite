@@ -13,7 +13,10 @@ export class QueueService {
         } catch { }
 
         try {
-            return await this.redis.lpush('tracelite:fallback:events', '*', 'payload', JSON.stringify(event))
+            return await this.redis.lpush(
+                'tracelite:fallback:events',
+                JSON.stringify(event),
+            );
         } catch { }
 
         return null;

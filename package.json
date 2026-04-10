@@ -6,7 +6,8 @@
     "services/*"
   ],
   "scripts": {
-    "dev": "npm run start:dev --workspace=api",
+    "dev:api": "npm run start:dev --workspace=api",
+    "dev:worker": "npm run start:dev --workspace=worker",
     "db:migrate": "prisma migrate dev --schema=packages/db/prisma/schema.prisma",
     "db:generate": "prisma generate --schema=packages/db/prisma/schema.prisma"
   },
