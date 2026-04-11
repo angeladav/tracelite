@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
+import { REDIS_KEYS } from '@tracelite/common'
 
 @Injectable()
 export class QueueService {
@@ -9,12 +10,12 @@ export class QueueService {
 
     async enqueue(event) {
         try {
-            return await this.redis.xadd('tracelite:events', '*', 'payload', JSON.stringify(event))
+            return await this.redis.xadd(REDIS_KEYS.STREAM_EVENTS, '*', 'payload', JSON.stringify(event))
         } catch { }
 
         try {
             return await this.redis.lpush(
-                'tracelite:fallback:events',
+                REDIS_KEYS.FALLBACK_EVENTS,
                 JSON.stringify(event),
             );
         } catch { }

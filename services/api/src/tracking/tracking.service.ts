@@ -17,6 +17,7 @@ export class TrackingService {
             endpoint,
             statusCode,
             latencyMs,
+            organizationId
         } = trackEventDto;
 
         const trackData = {
@@ -25,6 +26,7 @@ export class TrackingService {
             statusCode,
             latencyMs,
             apiKeyId: apiKey,
+            organizationId,
             idempotencyKey: trackEventDto.idempotencyKey,
             metadata: trackEventDto.metadata,
         };
@@ -34,13 +36,7 @@ export class TrackingService {
         if (res) return;
 
         const request = await this.prisma.requestLog.create({
-            data: {
-                method,
-                endpoint,
-                statusCode,
-                latencyMs,
-                apiKeyId: apiKey
-            }
+            data: trackData
         });
 
         return {

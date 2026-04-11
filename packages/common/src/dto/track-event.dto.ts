@@ -7,6 +7,7 @@ import {
   Max,
   IsIn,
 } from 'class-validator';
+import type { JsonObject } from '../types/json-value';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'] as const;
 
@@ -16,6 +17,9 @@ export class TrackEventDto {
 
   @IsString()
   endpoint: string;
+
+  @IsString()
+  organizationId: string;
 
   @IsInt()
   @Min(100)
@@ -28,7 +32,7 @@ export class TrackEventDto {
 
   @IsOptional()
   @IsObject()
-  metadata?: Record<string, unknown>;
+  metadata?: JsonObject;
 
   @IsOptional()
   @IsString()

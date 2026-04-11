@@ -1,3 +1,7 @@
+import type { JsonObject } from './json-value';
+
+export type { JsonObject, JsonValue } from './json-value';
+
 export interface TrackingEvent {
   apiKeyId: string;
   organizationId: string;
@@ -7,7 +11,7 @@ export interface TrackingEvent {
   latencyMs: number;
   userAgent?: string;
   ipAddress?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: JsonObject;
   idempotencyKey?: string;
   timestamp: string;
 }

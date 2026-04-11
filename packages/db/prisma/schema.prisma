@@ -29,6 +29,7 @@ model Organization {
   updatedAt   DateTime     @updatedAt
   memberships Membership[]
   apiKeys     ApiKey[]
+  requestLogs RequestLog[]
 }
 
 model Membership {
@@ -84,6 +85,8 @@ model RequestLog {
   id            String   @id @default(uuid())
   apiKey        ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   apiKeyId      String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String
   method        String
   endpoint      String
   statusCode    Int

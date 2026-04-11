@@ -16,6 +16,7 @@ export const RETENTION_DAYS = {
 } as const;
 
 export const REDIS_KEYS = {
+  STREAM_EVENTS: 'tracelite:events',
   FALLBACK_EVENTS: 'tracelite:fallback:events',
   RATE_LIMIT_PREFIX: 'tracelite:ratelimit:',
 } as const;
