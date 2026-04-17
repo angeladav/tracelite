@@ -5,6 +5,6 @@ import { RedisProvider } from './redis.provider';
 
 @Module({
   providers: [ConsumerService, PrismaService, RedisProvider],
-  imports: [ConsumerModule],
+  exports: [ConsumerService, PrismaService],
 })
 export class ConsumerModule {}

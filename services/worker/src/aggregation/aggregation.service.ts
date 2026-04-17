@@ -5,12 +5,14 @@ import { PrismaService } from '@tracelite/db';
 import { RETENTION_DAYS } from '@tracelite/common';
 
 type MinuteOrgAggRow = {
-  organizationId: string;
-  total_requests: bigint;
-  error_count: bigint;
-  avg_latency: number | null;
-  p95_latency: number | null;
-  p99_latency: number | null;
+    apiKeyId: string | null;
+    organizationId: string;
+    endpoint: string | null;
+    total_requests: bigint;
+    error_count: bigint;
+    avg_latency: number | null;
+    p95_latency: number | null;
+    p99_latency: number | null;
 };
 
 @Injectable()
@@ -110,6 +112,14 @@ export class AggregationService {
         const rows = await this.prisma.$queryRaw<MinuteOrgAggRow[]>(Prisma.sql`
       SELECT
         rl."organizationId" AS "organizationId",
+        CASE
+          WHEN GROUPING(rl."apiKeyId") = 0 THEN rl."apiKeyId"
+          ELSE NULL
+        END AS "apiKeyId",
+        CASE
+          WHEN GROUPING(rl."endpoint") = 0 THEN rl."endpoint"
+          ELSE NULL
+        END AS "endpoint",
         COUNT(*)::bigint AS total_requests,
         COUNT(*) FILTER (WHERE rl."statusCode" >= 400)::bigint AS error_count,
         AVG(rl."latencyMs")::float AS avg_latency,
@@ -124,47 +134,48 @@ export class AggregationService {
       FROM "RequestLog" rl
       WHERE rl."timestamp" >= ${periodStart}
         AND rl."timestamp" < ${periodEnd}
-      GROUP BY rl."organizationId"
+      GROUP BY GROUPING SETS (
+        (rl."organizationId"),
+        (rl."organizationId", rl."apiKeyId"),
+        (rl."organizationId", rl."endpoint")
+      )
     `);
 
+        const metrics: Prisma.AggregatedMetricCreateManyInput[] = [];
         for (const r of rows) {
             const totalRequests = Number(r.total_requests);
             const errorCount = Number(r.error_count);
             const avgLatencyMs = r.avg_latency ?? 0;
             const p95LatencyMs = r.p95_latency ?? 0;
             const p99LatencyMs = r.p99_latency ?? 0;
-
-            await this.prisma.aggregatedMetric.upsert({
-                where: {
-                    organizationId_apiKeyId_endpoint_period_periodStart: {
-                        organizationId: r.organizationId,
-                        apiKeyId: null,
-                        endpoint: null,
-                        period,
-                        periodStart,
-                    } as unknown as Prisma.AggregatedMetricOrganizationIdApiKeyIdEndpointPeriodPeriodStartCompoundUniqueInput,
-                },
-                create: {
-                    organizationId: r.organizationId,
-                    apiKeyId: null,
-                    endpoint: null,
-                    period,
-                    periodStart,
-                    totalRequests,
-                    errorCount,
-                    avgLatencyMs,
-                    p95LatencyMs,
-                    p99LatencyMs,
-                },
-                update: {
-                    totalRequests,
-                    errorCount,
-                    avgLatencyMs,
-                    p95LatencyMs,
-                    p99LatencyMs,
-                },
+            metrics.push({
+                organizationId: r.organizationId,
+                apiKeyId: r.apiKeyId,
+                endpoint: r.endpoint,
+                period,
+                periodStart,
+                totalRequests,
+                errorCount,
+                avgLatencyMs,
+                p95LatencyMs,
+                p99LatencyMs,
             });
         }
+
+        await this.prisma.$transaction(async (tx) => {
+            await tx.aggregatedMetric.deleteMany({
+                where: {
+                    period,
+                    periodStart,
+                },
+            });
+
+            if (metrics.length > 0) {
+                await tx.aggregatedMetric.createMany({
+                    data: metrics,
+                });
+            }
+        });
     }
 
     @Cron('* * * * *')
@@ -178,6 +189,7 @@ export class AggregationService {
 
         for (const periodStart of periodStarts) {
             const periodEnd = this.addMinutes(periodStart, 1);
+ 
             await this.aggregateBucketOrgRollup(periodStart, periodEnd, AggPeriod.MINUTE);
         }
     }

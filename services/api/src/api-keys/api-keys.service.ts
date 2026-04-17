@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@tracelite/db';
 import { randomBytes } from 'crypto';
 import { ApiKeyDto } from './dto/api-key.dto';
@@ -45,11 +45,16 @@ export class ApiKeysService {
     async deleteKey(orgId: string, id: string, userId: string) {
         await this.isUserInOrg(orgId, userId);
 
-        await this.prisma.apiKey.delete({
+        const result = await this.prisma.apiKey.updateMany({
             where: {
-                id
-            }
+                id,
+                organizationId: orgId,
+            },
+            data: { revoked: true },
         });
+        if (result.count === 0) {
+            throw new NotFoundException('API key not found');
+        }
     }
 
     async isUserInOrg(orgId: string, userId: string) {

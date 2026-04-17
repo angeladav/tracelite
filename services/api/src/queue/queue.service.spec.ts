@@ -6,7 +6,16 @@ describe('QueueService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [QueueService],
+      providers: [
+        QueueService,
+        {
+          provide: 'REDIS_CLIENT',
+          useValue: {
+            xadd: jest.fn().mockResolvedValue('1-0'),
+            lpush: jest.fn().mockResolvedValue(1),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<QueueService>(QueueService);

@@ -57,16 +57,17 @@ curl -X POST localhost:3000/v1/auth/login \
 
 ```bash
 # Verify (use JWT from Day 2)
-curl -v -X POST http://localhost:3000/v1/organizations \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWI1NzQ0ZC0yNTAwLTRhMjItYjlkMC0wYzhmOTQzZGI0ZTAiLCJlbWFpbCI6InRlc3QzQHRlc3QuY29tIiwiaWF0IjoxNzc1NTcxNDM4LCJleHAiOjE3NzYxNzYyMzh9.5exK9pDYkHzEmQ7o7IAxX7qyY6y14MT-6S_AiTFwpdQ" \
+curl -X POST http://localhost:3000/v1/organizations \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGU1ZDNmYS05ZTk5LTRiYzctYjk2Ny0yNmZmNGJkNDc3YTgiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE3NzYwMjIwMTMsImV4cCI6MTc3NjYyNjgxM30.6imB6kuURxMct_g-NNQHeAw0JslaOvINBc3fHtoyESA" \
      -H "Content-Type: application/json" \
      --data-raw '{"name":"My Org","slug":"my-org"}'
 
-curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWI1NzQ0ZC0yNTAwLTRhMjItYjlkMC0wYzhmOTQzZGI0ZTAiLCJlbWFpbCI6InRlc3QzQHRlc3QuY29tIiwiaWF0IjoxNzc1NTcxNDM4LCJleHAiOjE3NzYxNzYyMzh9.5exK9pDYkHzEmQ7o7IAxX7qyY6y14MT-6S_AiTFwpdQ" \
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGU1ZDNmYS05ZTk5LTRiYzctYjk2Ny0yNmZmNGJkNDc3YTgiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE3NzYwMjIwMTMsImV4cCI6MTc3NjYyNjgxM30.6imB6kuURxMct_g-NNQHeAw0JslaOvINBc3fHtoyESA" \
 -H "Content-Type: application/json" \
-  -X POST localhost:3000/v1/organizations/4ac489bc-fa0e-4917-8a74-c373d6303113/api-keys \
+  -X POST localhost:3000/v1/organizations/7da45ce4-2b72-4a3d-86ce-6f1a529d3436/api-keys \
   -d '{"name":"prod-key"}'
 # Should return key starting with tl_live_
+tl_live_5071b4b8ab6348bd26c0f3f973286a13
 ```
 
 npx prisma studio --schema=packages/db/prisma/schema.prisma
@@ -85,10 +86,10 @@ npx prisma studio --schema=packages/db/prisma/schema.prisma
 ```bash
 # Verify
 curl -X POST localhost:3000/v1/track \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlOWI1NzQ0ZC0yNTAwLTRhMjItYjlkMC0wYzhmOTQzZGI0ZTAiLCJlbWFpbCI6InRlc3QzQHRlc3QuY29tIiwiaWF0IjoxNzc1NTcxNDM4LCJleHAiOjE3NzYxNzYyMzh9.5exK9pDYkHzEmQ7o7IAxX7qyY6y14MT-6S_AiTFwpdQ" \
-  -H "X-API-Key: tl_live_5a9c684efba9fca42ce8212dfc6a901c" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGU1ZDNmYS05ZTk5LTRiYzctYjk2Ny0yNmZmNGJkNDc3YTgiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE3NzYwMjIwMTMsImV4cCI6MTc3NjYyNjgxM30.6imB6kuURxMct_g-NNQHeAw0JslaOvINBc3fHtoyESA" \
+  -H "X-API-Key: tl_live_5071b4b8ab6348bd26c0f3f973286a13" \
   -H "Content-Type: application/json" \
-  -d '{"method":"GET","endpoint":"/users","statusCode":200,"latencyMs":42}'
+  -d '{"method":"GET","endpoint":"/users","statusCode":200,"latencyMs":42, "organizationId":"7da45ce4-2b72-4a3d-86ce-6f1a529d3436"}'
 # Should return 202
 ```
 
@@ -157,7 +158,12 @@ npx prisma studio --schema=packages/db/prisma/schema.prisma
 
 ```bash
 # Verify
-curl -H "Authorization: Bearer <jwt>" localhost:3000/v1/analytics/overview
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGU1ZDNmYS05ZTk5LTRiYzctYjk2Ny0yNmZmNGJkNDc3YTgiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE3NzYwMjIwMTMsImV4cCI6MTc3NjYyNjgxM30.6imB6kuURxMct_g-NNQHeAw0JslaOvINBc3fHtoyESA" localhost:3000/v1/analytics/overview?organizationId=7da45ce4-2b72-4a3d-86ce-6f1a529d3436 \
+
+curl -i \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyOGU1ZDNmYS05ZTk5LTRiYzctYjk2Ny0yNmZmNGJkNDc3YTgiLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJpYXQiOjE3NzYwMjIwMTMsImV4cCI6MTc3NjYyNjgxM30.6imB6kuURxMct_g-NNQHeAw0JslaOvINBc3fHtoyESA" \
+  "http://localhost:3000/v1/analytics/overview?organizationId=7da45ce4-2b72-4a3d-86ce-6f1a529d3436"
+
 curl -H "Authorization: Bearer <jwt>" localhost:3000/v1/analytics/timeseries?period=HOUR
 ```
 

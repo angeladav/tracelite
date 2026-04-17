@@ -6,6 +6,8 @@ import { TrackingModule } from './tracking/tracking.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { QueueModule } from './queue/queue.module';
 import { DatabaseModule } from './database/database.module';
+import { HealthModule } from './health/health.module';
+import { AppController } from './app.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ThrottlerModule, seconds } from '@nestjs/throttler';
@@ -14,24 +16,25 @@ import Redis from 'ioredis';
 
 
 @Module({
+  controllers: [AppController],
   providers: [
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    }
+    },
   ],
-  imports: [DatabaseModule, AuthModule, OrganizationsModule, ApiKeysModule, TrackingModule, AnalyticsModule, QueueModule,
+  imports: [DatabaseModule, HealthModule, AuthModule, OrganizationsModule, ApiKeysModule, TrackingModule, AnalyticsModule, QueueModule,
     ThrottlerModule.forRoot({
       throttlers: [{
         limit: 10,       // Max 10 requests
         ttl: seconds(60) // Per 60 seconds
       }],
-      storage: new ThrottlerStorageRedisService(new Redis(
-        {
+      storage: new ThrottlerStorageRedisService(
+        new Redis({
           host: process.env.REDIS_HOST || 'localhost',
-          port: parseInt(process.env.REDIS_PORT!) || 6379,
-        }
-      )),
+          port: parseInt(process.env.REDIS_PORT || '6379', 10),
+        }),
+      ),
     }),
 
   ],

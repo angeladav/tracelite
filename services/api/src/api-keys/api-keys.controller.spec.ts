@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiKeysController } from './api-keys.controller';
+import { ApiKeysService } from './api-keys.service';
 
 describe('ApiKeysController', () => {
   let controller: ApiKeysController;
@@ -7,6 +8,16 @@ describe('ApiKeysController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ApiKeysController],
+      providers: [
+        {
+          provide: ApiKeysService,
+          useValue: {
+            generateKey: jest.fn(),
+            getKeys: jest.fn(),
+            deleteKey: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<ApiKeysController>(ApiKeysController);

@@ -1,17 +1,11 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
-import { AppService } from './app.service';
-import { AuthService } from './auth/auth.service';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly authService: AuthService
-  ) { }
-
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: { user: unknown }) {
     return req.user;
   }
 }

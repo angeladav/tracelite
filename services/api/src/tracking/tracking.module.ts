@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TrackingService } from './tracking.service';
 import { TrackingController } from './tracking.controller';
-import { QueueService } from 'src/queue/queue.service';
-import { RedisProvider } from 'src/queue/redis.provider';
+import { QueueModule } from '../queue/queue.module';
 
 @Module({
-  providers: [TrackingService, QueueService, RedisProvider],
-  controllers: [TrackingController]
+  imports: [QueueModule],
+  providers: [TrackingService],
+  controllers: [TrackingController],
 })
-export class TrackingModule { }
+export class TrackingModule {}

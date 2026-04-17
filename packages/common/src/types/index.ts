@@ -3,6 +3,8 @@ import type { JsonObject } from './json-value';
 export type { JsonObject, JsonValue } from './json-value';
 
 export interface TrackingEvent {
+  /** When set, worker persists RequestLog with this id (matches API `eventId`). */
+  id?: string;
   apiKeyId: string;
   organizationId: string;
   method: string;

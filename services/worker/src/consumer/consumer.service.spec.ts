@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from '@tracelite/db';
 import { ConsumerService } from './consumer.service';
 
 describe('ConsumerService', () => {
@@ -6,7 +7,11 @@ describe('ConsumerService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ConsumerService],
+      providers: [
+        ConsumerService,
+        { provide: 'REDIS_CLIENT', useValue: {} },
+        { provide: PrismaService, useValue: {} },
+      ],
     }).compile();
 
     service = module.get<ConsumerService>(ConsumerService);

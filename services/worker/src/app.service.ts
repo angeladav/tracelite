@@ -1,25 +1,33 @@
 import {
-  Inject,
   Injectable,
-  Logger,
   OnModuleDestroy,
   OnModuleInit,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { PrismaService } from '@tracelite/db';
 import { ConsumerService } from './consumer/consumer.service';
 
 @Injectable()
 export class AppService implements OnModuleInit, OnModuleDestroy {
   constructor(
-    private readonly consumerService: ConsumerService
+    private readonly consumerService: ConsumerService,
+    private readonly prisma: PrismaService,
   ) {}
 
   getHello(): string {
     return 'Hello World!';
   }
 
-  getHealth(): { status: string } {
-    return { status: 'ok' };
+  async getHealth(): Promise<{ status: string; db: string }> {
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
+      return { status: 'ok', db: 'connected' };
+    } catch {
+      throw new ServiceUnavailableException({
+        status: 'error',
+        db: 'disconnected',
+      });
+    }
   }
 
   async onModuleInit(): Promise<void> {

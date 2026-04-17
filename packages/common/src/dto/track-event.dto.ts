@@ -6,6 +6,7 @@ import {
   Min,
   Max,
   IsIn,
+  IsUUID,
 } from 'class-validator';
 import type { JsonObject } from '../types/json-value';
 
@@ -18,8 +19,10 @@ export class TrackEventDto {
   @IsString()
   endpoint: string;
 
-  @IsString()
-  organizationId: string;
+  /** Ignored for persistence: organization is taken from the API key. Optional for backwards compatibility. */
+  @IsOptional()
+  @IsUUID()
+  organizationId?: string;
 
   @IsInt()
   @Min(100)

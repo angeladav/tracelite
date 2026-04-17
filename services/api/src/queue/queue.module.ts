@@ -3,6 +3,7 @@ import { QueueService } from './queue.service';
 import { RedisProvider } from './redis.provider';
 
 @Module({
-  providers: [QueueService, RedisProvider]
+  providers: [QueueService, RedisProvider],
+  exports: [QueueService, RedisProvider],
 })
 export class QueueModule { }

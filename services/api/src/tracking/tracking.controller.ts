@@ -1,22 +1,22 @@
-import { Body, Controller, Post, Headers, HttpCode, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, Req, UseGuards } from '@nestjs/common';
 import { TrackingService } from './tracking.service';
 import { TrackEventDto } from '@tracelite/common';
-import { ApiKeyGuard } from 'src/common/guards/api-key.guard';
+import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { Public } from '../common/decorators/public.decorator';
 
 @Controller('track')
 export class TrackingController {
+    constructor(private readonly trackingService: TrackingService) {}
 
-    constructor(
-        private readonly trackingService: TrackingService
-    ) { }
-
-    @UseGuards(ThrottlerGuard)
-    @UseGuards(ApiKeyGuard)
+    @Public()
+    @UseGuards(ThrottlerGuard, ApiKeyGuard)
     @Post()
     @HttpCode(202)
-    track(@Req() req, @Body() trackEventDto: TrackEventDto) {
-        return this.trackingService.track(req.apiKeyId, trackEventDto);
+    track(
+        @Req() req: { apiKeyId: string; organizationId: string },
+        @Body() trackEventDto: TrackEventDto,
+    ) {
+        return this.trackingService.track(req.apiKeyId, req.organizationId, trackEventDto);
     }
-
 }

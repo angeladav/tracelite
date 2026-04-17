@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from '@tracelite/db';
 import { AnalyticsService } from './analytics.service';
 
 describe('AnalyticsService', () => {
@@ -6,7 +7,22 @@ describe('AnalyticsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AnalyticsService],
+      providers: [
+        AnalyticsService,
+        {
+          provide: PrismaService,
+          useValue: {
+            user: { findUnique: jest.fn() },
+            membership: { findUnique: jest.fn() },
+            aggregatedMetric: { findMany: jest.fn() },
+            requestLog: { findMany: jest.fn() },
+          },
+        },
+        {
+          provide: 'REDIS_CLIENT',
+          useValue: { get: jest.fn(), set: jest.fn() },
+        },
+      ],
     }).compile();
 
     service = module.get<AnalyticsService>(AnalyticsService);
