@@ -8,6 +8,7 @@
   "scripts": {
     "dev:api": "npm run start:dev --workspace=api",
     "dev:worker": "npm run start:dev --workspace=worker",
+    "dev:dashboard": "cd dashboard && npm run dev",
     "db:see": "npx prisma studio --schema=packages/db/prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema=packages/db/prisma/schema.prisma",
     "db:generate": "prisma generate --schema=packages/db/prisma/schema.prisma"
@@ -16,7 +17,10 @@
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^25.5.2",
     "@types/passport-local": "^1.0.38",
-    "prisma": "^5.22.0"
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.10",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^4.2.3"
   },
   "dependencies": {
     "@nest-lab/throttler-storage-redis": "^1.2.0",
@@ -32,7 +36,9 @@
     "class-validator": "^0.15.1",
     "helmet": "^8.1.0",
     "ioredis": "^5.10.1",
+    "lucide-react": "^1.8.0",
     "passport": "^0.7.0",
-    "passport-jwt": "^4.0.1"
+    "passport-jwt": "^4.0.1",
+    "recharts": "^3.8.1"
   }
 }

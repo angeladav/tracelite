@@ -11,7 +11,7 @@ export class OrganizationsService {
     async createOrg(organizationDto: OrganizationDto, userId: string) {
         const name = organizationDto.name;
         const doesOrgAlreadyExist = await this.prisma.organization.findUnique({ where: { name } });
-        if (doesOrgAlreadyExist) throw new Error('Email already exists');
+        if (doesOrgAlreadyExist) throw new Error('Organization already exists');
         const slug = name.toLowerCase().trim().replace(/\s+/g, '-');
         await this.prisma.organization.create({
             data: {

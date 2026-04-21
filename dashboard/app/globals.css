@@ -1,26 +1,42 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Literal values so Tailwind v4 emits bg-tl-* / text-tl-* utilities reliably */
+@theme {
+  --color-tl-bg: #0a0a0b;
+  --color-tl-card: #141416;
+  --color-tl-card-hover: #1c1c1f;
+  --color-tl-border: #27272a;
+  --color-tl-text-primary: #fafafa;
+  --color-tl-text-secondary: #a1a1aa;
+  --color-tl-text-muted: #52525b;
+  --color-tl-accent: #3b82f6;
+  --color-tl-accent-hover: #2563eb;
+  --color-tl-success: #22c55e;
+  --color-tl-warning: #eab308;
+  --color-tl-error: #ef4444;
+  --color-tl-chart-blue: #3b82f6;
+  --color-tl-chart-red: #ef4444;
+  --color-tl-chart-purple: #8b5cf6;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
+  background-color: #0a0a0b;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  background-color: #0a0a0b;
+  color: #fafafa;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-code {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+/* Recharts default surface can read as light grey on some builds */
+.recharts-wrapper,
+.recharts-surface {
+  background-color: transparent !important;
 }
